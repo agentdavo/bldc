@@ -20,7 +20,8 @@
 #ifndef HW_H_
 #define HW_H_
 
-#include "stm32f4xx_conf.h"
+//TODO: Should be moved somewhere where it is needed for stm32 only
+//#include "stm32f4xx_conf.h"
 #include HW_HEADER
 
 #ifdef HW_HAS_DRV8301
@@ -34,6 +35,9 @@
 #endif
 #ifdef HW_HAS_DRV8323S
 #include "drv8323s.h"
+#endif
+#ifdef HW_HAS_DRV_PAC55XX
+#include "drv_pac55xx.h"
 #endif
 
 #ifndef HW_NAME
@@ -131,6 +135,18 @@
  *
  * Requires running
  * drv8323s_init();
+ * at the end of void hw_init_gpio(void)
+ */
+ 
+ /*
+ * #define HW_HAS_DRV_PAC55XX
+ *
+ * Use the internal PAC55XX driver
+ *
+ * Requires defining SPI pins for the driver:
+ *
+ * Requires running
+ * drv_pac55xx_init();
  * at the end of void hw_init_gpio(void)
  */
 
