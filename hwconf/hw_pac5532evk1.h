@@ -183,16 +183,16 @@
 #define HW_CANTX_PIN
 
 // SPI pins
-#define HW_SPI_DEV				SPID1
-#define HW_SPI_GPIO_AF			GPIO_AF_SPI1
-#define HW_SPI_PORT_NSS			GPIOA
-#define HW_SPI_PIN_NSS			15
-#define HW_SPI_PORT_SCK			GPIOC
-#define HW_SPI_PIN_SCK			10
-#define HW_SPI_PORT_MOSI		GPIOC
-#define HW_SPI_PIN_MOSI			12
-#define HW_SPI_PORT_MISO		GPIOC
-#define HW_SPI_PIN_MISO			11
+#define HW_SPI_DEV				
+#define HW_SPI_GPIO_AF			
+#define HW_SPI_PORT_NSS			
+#define HW_SPI_PIN_NSS			
+#define HW_SPI_PORT_SCK			
+#define HW_SPI_PIN_SCK			
+#define HW_SPI_PORT_MOSI		
+#define HW_SPI_PIN_MOSI		
+#define HW_SPI_PORT_MISO		
+#define HW_SPI_PIN_MISO			
 
 // Hall/encoder pins
 #define HW_HALL_ENC_GPIO1		
