@@ -13,6 +13,12 @@ An open source motor controller firmware.
 This is the source code for the VESC DC/BLDC/FOC controller. Read more at
 [https://vesc-project.com/](https://vesc-project.com/)
 
+
+
+# licensing restrictions
+
+To compile this version of vesc bldc firmware you will need to download the "PAC55xx Software Development Kit" from https://www.qorvo.com/products/p/PAC5532#evaluation-tools and extract to ChibiOS_3.0.5/ext/pac55xx/pac55xx_sdk/
+
 ## Supported boards
 
 All  of them!

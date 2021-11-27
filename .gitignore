@@ -7,3 +7,5 @@ build
 .settings/language.settings.xml
 .DS_Store
 workspace.code-workspace
+/ChibiOS_3.0.5/ext/pac55xx/pac55xx_sdk/*
+!**/.gitkeep
