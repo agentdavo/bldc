@@ -18,12 +18,15 @@
 #include "ch.h"
 #include "hal.h"
 #include "stm32f4xx_conf.h"
-#include "drv8323s.h"
 #include "comm_can.h"
 #include "mc_interface.h"
 #include "ledpwm.h"
 #include "utils.h"
 #include "main.h"
+
+#ifndef HW_VER_IS_100DX
+	#include "drv8323s.h"
+#endif
 
 typedef enum {
 	SWITCH_BOOTED = 0,
@@ -61,7 +64,7 @@ void hw_init_gpio(void) {
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, ENABLE);
 
-#ifdef HW_VER_IS_100D_V2
+#if defined(HW_VER_IS_100D_V2) || defined(HW_VER_IS_100DX)
 	palSetPadMode(PHASE_FILTER_GPIO, PHASE_FILTER_PIN,
 				  PAL_MODE_OUTPUT_PUSHPULL |
 				  PAL_STM32_OSPEED_HIGHEST);
@@ -181,8 +184,9 @@ void hw_init_gpio(void) {
 	palSetPadMode(GPIOC, 4, PAL_MODE_INPUT_ANALOG);
 	palSetPadMode(GPIOC, 5, PAL_MODE_INPUT_ANALOG);
 	ENABLE_GATE();
-
+#ifndef HW_VER_IS_100DX
 	drv8323s_init();
+#endif
 }
 
 void hw_setup_adc_channels(void) {
@@ -404,7 +408,7 @@ bool smart_switch_is_pressed(void) {
 
 static THD_FUNCTION(switch_color_thread, arg) {
 	(void)arg;
-	chRegSetThreadName("switch_color_thread");
+	chRegSetThreadName("switch_color");
 	float switch_red = 0.0;
 	float switch_green = 0.0;
 	float switch_blue = 0.0;

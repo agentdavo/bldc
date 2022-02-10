@@ -58,7 +58,7 @@ int32_t confgenerator_serialize_mcconf(uint8_t *buffer, const mc_configuration *
 	buffer_append_float32_auto(buffer, conf->hall_sl_erpm, &ind);
 	buffer_append_float32_auto(buffer, conf->foc_current_kp, &ind);
 	buffer_append_float32_auto(buffer, conf->foc_current_ki, &ind);
-	buffer_append_float32_auto(buffer, conf->foc_f_sw, &ind);
+	buffer_append_float32_auto(buffer, conf->foc_f_zv, &ind);
 	buffer_append_float32_auto(buffer, conf->foc_dt_us, &ind);
 	buffer[ind++] = conf->foc_encoder_inverted;
 	buffer_append_float32_auto(buffer, conf->foc_encoder_offset, &ind);
@@ -77,6 +77,7 @@ int32_t confgenerator_serialize_mcconf(uint8_t *buffer, const mc_configuration *
 	buffer_append_float32_auto(buffer, conf->foc_motor_flux_linkage, &ind);
 	buffer_append_float32_auto(buffer, conf->foc_observer_gain, &ind);
 	buffer_append_float32_auto(buffer, conf->foc_observer_gain_slow, &ind);
+	buffer_append_float16(buffer, conf->foc_observer_offset, 1000, &ind);
 	buffer_append_float32_auto(buffer, conf->foc_duty_dowmramp_kp, &ind);
 	buffer_append_float32_auto(buffer, conf->foc_duty_dowmramp_ki, &ind);
 	buffer_append_float32_auto(buffer, conf->foc_openloop_rpm, &ind);
@@ -169,6 +170,8 @@ int32_t confgenerator_serialize_mcconf(uint8_t *buffer, const mc_configuration *
 	buffer[ind++] = conf->m_out_aux_mode;
 	buffer[ind++] = conf->m_motor_temp_sens_type;
 	buffer_append_float32_auto(buffer, conf->m_ptc_motor_coeff, &ind);
+	buffer_append_float16(buffer, conf->m_ntcx_ptcx_res, 0.1, &ind);
+	buffer_append_float16(buffer, conf->m_ntcx_ptcx_temp_base, 10, &ind);
 	buffer[ind++] = (uint8_t)conf->m_hall_extra_samples;
 	buffer[ind++] = (uint8_t)conf->si_motor_poles;
 	buffer_append_float32_auto(buffer, conf->si_gear_ratio, &ind);
@@ -426,7 +429,7 @@ bool confgenerator_deserialize_mcconf(const uint8_t *buffer, mc_configuration *c
 	conf->hall_sl_erpm = buffer_get_float32_auto(buffer, &ind);
 	conf->foc_current_kp = buffer_get_float32_auto(buffer, &ind);
 	conf->foc_current_ki = buffer_get_float32_auto(buffer, &ind);
-	conf->foc_f_sw = buffer_get_float32_auto(buffer, &ind);
+	conf->foc_f_zv = buffer_get_float32_auto(buffer, &ind);
 	conf->foc_dt_us = buffer_get_float32_auto(buffer, &ind);
 	conf->foc_encoder_inverted = buffer[ind++];
 	conf->foc_encoder_offset = buffer_get_float32_auto(buffer, &ind);
@@ -445,6 +448,7 @@ bool confgenerator_deserialize_mcconf(const uint8_t *buffer, mc_configuration *c
 	conf->foc_motor_flux_linkage = buffer_get_float32_auto(buffer, &ind);
 	conf->foc_observer_gain = buffer_get_float32_auto(buffer, &ind);
 	conf->foc_observer_gain_slow = buffer_get_float32_auto(buffer, &ind);
+	conf->foc_observer_offset = buffer_get_float16(buffer, 1000, &ind);
 	conf->foc_duty_dowmramp_kp = buffer_get_float32_auto(buffer, &ind);
 	conf->foc_duty_dowmramp_ki = buffer_get_float32_auto(buffer, &ind);
 	conf->foc_openloop_rpm = buffer_get_float32_auto(buffer, &ind);
@@ -537,6 +541,8 @@ bool confgenerator_deserialize_mcconf(const uint8_t *buffer, mc_configuration *c
 	conf->m_out_aux_mode = buffer[ind++];
 	conf->m_motor_temp_sens_type = buffer[ind++];
 	conf->m_ptc_motor_coeff = buffer_get_float32_auto(buffer, &ind);
+	conf->m_ntcx_ptcx_res = buffer_get_float16(buffer, 0.1, &ind);
+	conf->m_ntcx_ptcx_temp_base = buffer_get_float16(buffer, 10, &ind);
 	conf->m_hall_extra_samples = buffer[ind++];
 	conf->si_motor_poles = buffer[ind++];
 	conf->si_gear_ratio = buffer_get_float32_auto(buffer, &ind);
@@ -790,7 +796,7 @@ void confgenerator_set_defaults_mcconf(mc_configuration *conf) {
 	conf->hall_sl_erpm = MCCONF_HALL_ERPM;
 	conf->foc_current_kp = MCCONF_FOC_CURRENT_KP;
 	conf->foc_current_ki = MCCONF_FOC_CURRENT_KI;
-	conf->foc_f_sw = MCCONF_FOC_F_SW;
+	conf->foc_f_zv = MCCONF_FOC_F_ZV;
 	conf->foc_dt_us = MCCONF_FOC_DT_US;
 	conf->foc_encoder_inverted = MCCONF_FOC_ENCODER_INVERTED;
 	conf->foc_encoder_offset = MCCONF_FOC_ENCODER_OFFSET;
@@ -809,6 +815,7 @@ void confgenerator_set_defaults_mcconf(mc_configuration *conf) {
 	conf->foc_motor_flux_linkage = MCCONF_FOC_MOTOR_FLUX_LINKAGE;
 	conf->foc_observer_gain = MCCONF_FOC_OBSERVER_GAIN;
 	conf->foc_observer_gain_slow = MCCONF_FOC_OBSERVER_GAIN_SLOW;
+	conf->foc_observer_offset = MCCONF_FOC_OBSERVER_OFFSET;
 	conf->foc_duty_dowmramp_kp = MCCONF_FOC_DUTY_DOWNRAMP_KP;
 	conf->foc_duty_dowmramp_ki = MCCONF_FOC_DUTY_DOWNRAMP_KI;
 	conf->foc_openloop_rpm = MCCONF_FOC_OPENLOOP_RPM;
@@ -901,6 +908,8 @@ void confgenerator_set_defaults_mcconf(mc_configuration *conf) {
 	conf->m_out_aux_mode = MCCONF_M_OUT_AUX_MODE;
 	conf->m_motor_temp_sens_type = MCCONF_M_MOTOR_TEMP_SENS_TYPE;
 	conf->m_ptc_motor_coeff = MCCONF_M_PTC_MOTOR_COEFF;
+	conf->m_ntcx_ptcx_res = MCCONF_M_NTCX_PTCX_RES;
+	conf->m_ntcx_ptcx_temp_base = MCCONF_M_NTCX_PTCX_BASE_TEMP;
 	conf->m_hall_extra_samples = MCCONF_M_HALL_EXTRA_SAMPLES;
 	conf->si_motor_poles = MCCONF_SI_MOTOR_POLES;
 	conf->si_gear_ratio = MCCONF_SI_GEAR_RATIO;

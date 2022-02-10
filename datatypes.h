@@ -86,7 +86,9 @@ typedef enum {
 	TEMP_SENSOR_PTC_1K_100C,
 	TEMP_SENSOR_KTY83_122,
 	TEMP_SENSOR_NTC_100K_25C,
-	TEMP_SENSOR_KTY84_130
+	TEMP_SENSOR_KTY84_130,
+	TEMP_SENSOR_NTCX,
+	TEMP_SENSOR_PTCX
 } temp_sensor_type;
 
 // General purpose drive output mode
@@ -368,7 +370,7 @@ typedef struct {
 	// FOC
 	float foc_current_kp;
 	float foc_current_ki;
-	float foc_f_sw;
+	float foc_f_zv;
 	float foc_dt_us;
 	float foc_encoder_offset;
 	bool foc_encoder_inverted;
@@ -384,6 +386,7 @@ typedef struct {
 	float foc_motor_flux_linkage;
 	float foc_observer_gain;
 	float foc_observer_gain_slow;
+	float foc_observer_offset;
 	float foc_pll_kp;
 	float foc_pll_ki;
 	float foc_duty_dowmramp_kp;
@@ -479,6 +482,8 @@ typedef struct {
 	temp_sensor_type m_motor_temp_sens_type;
 	float m_ptc_motor_coeff;
 	int m_hall_extra_samples;
+	float m_ntcx_ptcx_temp_base;
+	float m_ntcx_ptcx_res;
 	// Setup info
 	uint8_t si_motor_poles;
 	float si_gear_ratio;
@@ -583,7 +588,8 @@ typedef enum {
 typedef enum {
 	PAS_CTRL_TYPE_NONE = 0,
 	PAS_CTRL_TYPE_CADENCE,
-	PAS_CTRL_TYPE_CONSTANT_TORQUE
+	PAS_CTRL_TYPE_TORQUE,
+	PAS_CTRL_TYPE_TORQUE_WITH_CADENCE_TIMEOUT
 } pas_control_type;
 
 // PAS sensor types
@@ -1062,6 +1068,14 @@ typedef enum {
 	COMM_GET_EXT_HUM_TMP,
 	COMM_GET_STATS,
 	COMM_RESET_STATS,
+
+	// Lisp
+	COMM_LISP_READ_CODE,
+	COMM_LISP_WRITE_CODE,
+	COMM_LISP_ERASE_CODE,
+	COMM_LISP_SET_RUNNING,
+	COMM_LISP_GET_STATS,
+	COMM_LISP_PRINT
 } COMM_PACKET_ID;
 
 // CAN commands

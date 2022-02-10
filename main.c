@@ -56,6 +56,10 @@
 #include "events.h"
 #include "main.h"
 
+#ifdef USE_LISPBM
+#include "lispif.h"
+#endif
+
 /*
  * HW resources used:
  *
@@ -76,10 +80,10 @@
  */
 
 // Private variables
-static THD_WORKING_AREA(periodic_thread_wa, 512);
+static THD_WORKING_AREA(periodic_thread_wa, 256);
 static THD_WORKING_AREA(led_thread_wa, 256);
 static THD_WORKING_AREA(flash_integrity_check_thread_wa, 256);
-static bool m_init_done = false;
+static volatile bool m_init_done = false;
 
 static THD_FUNCTION(flash_integrity_check_thread, arg) {
 	(void)arg;
